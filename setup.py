@@ -4,6 +4,7 @@ from setuptools import setup
 from setuptools.extension import Extension
 from distutils.sysconfig import get_config_vars
 from subprocess import check_output
+import datetime
 import os
 import sys
 
@@ -24,7 +25,34 @@ except (IOError, ImportError, RuntimeError):
 USE_CYTHON = os.path.exists('pyroaring.pyx')
 if USE_CYTHON:
     print('Building pyroaring from Cython sources.')
-    check_output(['bash', 'prepare_dist.sh'])
+    # TODO run CRoaring/amalgamation.sh
+    header_text = """//   Copyright {} The CRoaring authors
+//
+//   Licensed under the Apache License, Version 2.0 (the "License");
+//   you may not use this file except in compliance with the License.
+//   You may obtain a copy of the License at
+//
+//       http://www.apache.org/licenses/LICENSE-2.0
+//
+//   Unless required by applicable law or agreed to in writing, software
+//   distributed under the License is distributed on an "AS IS" BASIS,
+//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//   See the License for the specific language governing permissions and
+//   limitations under the License.
+//
+// Github repository: https://github.com/RoaringBitmap/CRoaring/
+// Official website : http://roaringbitmap.org/
+""".format(datetime.date.today().year)
+    with open('roaring.c') as f:
+        roaring_c_text = f.read()
+    with open('roaring.c', 'w') as f:
+        f.write(header_text + roaring_c_text.replace('#include "roaring.h"',
+                                                     '#include "roaring.hh"'))
+    with open('roaring.h') as f:
+        roaring_h_text = f.read()
+    with open('roaring.h', 'w') as f:
+        f.write(header_text + roaring_h_text)
+    os.rename('roaring.h', 'roaring.hh')
     from Cython.Distutils import build_ext
     from Cython.Build import cythonize
     ext = 'pyx'
