@@ -2,7 +2,6 @@
 
 from setuptools import setup
 from setuptools.extension import Extension
-from setuptools.monkey import patch_for_msvc_specialized_compiler
 from distutils.sysconfig import get_config_vars
 import os
 import sys
@@ -13,9 +12,6 @@ VERSION = '0.2.1'
 PKG_DIR = 'pyroaring'
 
 PLATFORM_WINDOWS = (platform.system() == 'Windows')
-
-
-patch_for_msvc_specialized_compiler()
 
 
 def chdir(func, directory):
