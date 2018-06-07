@@ -41,12 +41,12 @@ test_script:
   - git clean -xfd
   # Testing several installation methods.
   - python setup.py bdist_wheel
-  - pip install dist/pyroaring*.whl
+  - powershell -Command pip install dist/pyroaring*.whl
   - python test.py
   - pip uninstall -y pyroaring
   - git clean -xfd
   - python setup.py sdist
-  - pip install dist/pyroaring*.tar.gz
+  - powershell -Command pip install dist/pyroaring*.tar.gz
   - python test.py
 
 after_test:
