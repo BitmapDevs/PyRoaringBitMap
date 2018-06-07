@@ -6,16 +6,23 @@ skip_branch_with_pr: false
 environment:
   matrix:
     - PYTHON: "C:\\Python27"
+      BITS: 32
     - PYTHON: "C:\\Python34"
+      BITS: 32
     - PYTHON: "C:\\Python35"
+      BITS: 32
     - PYTHON: "C:\\Python27-x64"
+      BITS: 64
     - PYTHON: "C:\\Python34-x64"
+      BITS: 64
       DISTUTILS_USE_SDK: "1"
     - PYTHON: "C:\\Python35-x64"
+      BITS: 64
     - PYTHON: "C:\\Python36-x64"
+      BITS: 64
 
 install:
-  - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
+  - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars%BITS%.bat"
   - set PATH=C:\%PYTHON%\scripts;C:\%PYTHON%;%PATH%
   - echo %PATH%
   - pip install hypothesis Cython wheel
