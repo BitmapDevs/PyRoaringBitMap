@@ -16,32 +16,33 @@ environment:
 
 install:
   - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
-  - %PYTHON%\\python.exe -m pip install hypothesis Cython wheel
+  - set PATH=C:\%PYTHON%\scripts;C:\%PYTHON%;%PATH%
+  - pip install hypothesis Cython wheel
   - git config core.symlinks true
   - git submodule init
   - git submodule update
   - git reset --hard
 
 build_script:
-  - %PYTHON%\\python.exe setup.py build_ext -i
+  - python setup.py build_ext -i
   - set HYPOTHESIS_PROFILE=ci
-  - %PYTHON%\\python.exe test.py
+  - python test.py
   - set HYPOTHESIS_PROFILE=
-  - %PYTHON%\\python.exe -c "import cydoctest, pyroaring; cydoctest.testmod(pyroaring)" -v
+  - python -c "import cydoctest, pyroaring; cydoctest.testmod(pyroaring)" -v
   - git clean -xfd
   # Testing several installation methods.
-  - %PYTHON%\\python.exe setup.py bdist_wheel
-  - %PYTHON%\\python.exe -m pip install dist/pyroaring*.whl
-  - %PYTHON%\\python.exe test.py
-  - %PYTHON%\\python.exe -m pip uninstall -y pyroaring
+  - python setup.py bdist_wheel
+  - pip install dist/pyroaring*.whl
+  - python test.py
+  - pip uninstall -y pyroaring
   - git clean -xfd
-  - %PYTHON%\\python.exe setup.py sdist
+  - python setup.py sdist
   - pip install dist/pyroaring*.tar.gz
-  - %PYTHON%\\python.exe test.py
+  - python test.py
 
 before_deploy:
-  - %PYTHON%\\python.exe setup.py bdist_wheel
-  - %PYTHON%\\python.exe setup.py sdist
+  - python setup.py bdist_wheel
+  - python setup.py sdist
   - dir dist
 
 artifacts:
