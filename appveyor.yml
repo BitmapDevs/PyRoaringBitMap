@@ -14,6 +14,24 @@ install:
 
 build_script:
 - python setup.py build_ext -i
-- set HYPOTHESIS_PROFILE=ci
-- python test.py
+- set HYPOTHESIS_PROFILE=ci&& python test.py
 - python -c "import cydoctest, pyroaring; cydoctest.testmod(pyroaring)" -v
+- git clean -xfd
+# Testing several installation methods.
+- python setup.py bdist_wheel
+- pip install dist/pyroaring*.whl
+- python test.py
+- pip uninstall -y pyroaring
+- git clean -xfd
+- python setup.py sdist
+- pip install dist/pyroaring*.tar.gz
+- python test.py
+
+before_deploy:
+- python setup.py bdist_wheel
+- python setup.py sdist
+- dir dist
+
+artifacts:
+- path: dist
+  name: wheels
