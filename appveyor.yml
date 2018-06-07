@@ -23,8 +23,7 @@ environment:
 
 install:
   - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars%BITS%.bat"
-  - set PATH=C:\%PYTHON%\scripts;C:\%PYTHON%;%PATH%
-  - echo %PATH%
+  - set PATH=%PYTHON%\scripts;%PYTHON%;%PATH%
   - pip install hypothesis Cython wheel
   - git config core.symlinks true
   - git reset --hard
