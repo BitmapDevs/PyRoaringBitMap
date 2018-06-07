@@ -14,7 +14,9 @@ install:
 
 build_script:
 - python setup.py build_ext -i
-- set HYPOTHESIS_PROFILE=ci&& python test.py
+- set HYPOTHESIS_PROFILE=ci
+- python test.py
+- set HYPOTHESIS_PROFILE=
 - python -c "import cydoctest, pyroaring; cydoctest.testmod(pyroaring)" -v
 - git clean -xfd
 # Testing several installation methods.
