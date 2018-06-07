@@ -23,7 +23,9 @@ install:
   - git submodule update
   - git reset --hard
 
-build_script:
+build: off
+
+test_script:
   - python setup.py build_ext -i
   - set HYPOTHESIS_PROFILE=ci
   - python test.py
@@ -40,11 +42,10 @@ build_script:
   - pip install dist/pyroaring*.tar.gz
   - python test.py
 
-before_deploy:
+after_test:
   - python setup.py bdist_wheel
   - python setup.py sdist
   - dir dist
 
 artifacts:
-  - path: dist
-    name: wheels
+  - path: dist\*
