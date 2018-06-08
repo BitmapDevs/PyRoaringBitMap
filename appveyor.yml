@@ -1,33 +1,41 @@
-image: Visual Studio 2017
 clone_depth: 1
 version: '{build}-{branch}'
 skip_branch_with_pr: false
-configuration: Release
 
 environment:
   matrix:
-    - py_version: 27
-    - py_version: 34
-    - py_version: 35
-    - py_version: 36
-
-platform:
-  - x86
-  - x64
+    - PYTHON: "C:\\Python27"
+      setup_env: 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86'
+    - PYTHON: "C:\\Python33"
+      setup_env: 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86'
+    - PYTHON: "C:\\Python34"
+      setup_env: 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86'
+    - PYTHON: "C:\\Python35"
+      setup_env: 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86'
+    - PYTHON: "C:\\Python36"
+      setup_env: 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86'
+    - PYTHON: "C:\\Python27-x64"
+      setup_env: 'call "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64 && call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86_amd64'
+    - PYTHON: "C:\\Python33-x64"
+      setup_env: 'call "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64 && call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86_amd64'
+      DISTUTILS_USE_SDK: "1"
+    - PYTHON: "C:\\Python34-x64"
+      setup_env: 'call "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64 && call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86_amd64'
+      DISTUTILS_USE_SDK: "1"
+    - PYTHON: "C:\\Python35-x64"
+      setup_env: 'call "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64 && call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86_amd64'
+    - PYTHON: "C:\\Python36-x64"
+      setup_env: 'call "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64 && call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86_amd64'
 
 install:
-  - set "PYTHON=C:\\Python%py_version%"
-  - ps: if ($Env:PLATFORM -eq "x64") { $Env:PYTHON = "${Env:PYTHON}-x64" }
-  - ps: if ($Env:py_version -eq "34") { $Env:DISTUTILS_USE_SDK = "1" }
   - ps: |
-      if ($env:py_version -eq "27") {
+      if ($env:PYTHON -match "Python27") {
         Invoke-WebRequest https://download.microsoft.com/download/7/9/6/796EF2E4-801B-4FC4-AB28-B59FBF6D907B/VCForPython27.msi -OutFile vc27.msi
         msiexec /q /i vc27.msi
       }
-  - '"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" %PLATFORM%'
-  - set PATH=%PYTHON%\scripts;%PYTHON%;%PATH%
-  - pip install --upgrade setuptools
-  - pip install hypothesis Cython wheel
+  - %setup_env%
+  - "%PYTHON%\\python.exe -m pip install --upgrade setuptools"
+  - "%PYTHON%\\python.exe -m pip install hypothesis Cython wheel"
   - git config core.symlinks true
   - git reset --hard
   - git submodule init
@@ -37,28 +45,28 @@ build: off
 
 test_script:
   # Run tests (note ci profile takes a while)
-  - python setup.py build_ext -i
+  - "build.cmd %PYTHON%\\python.exe setup.py build_ext -i"
   - set HYPOTHESIS_PROFILE=ci
-  - python test.py
+  - "%PYTHON%\\python.exe test.py"
   - set HYPOTHESIS_PROFILE=dev
-  - python -c "import cydoctest, pyroaring; cydoctest.testmod(pyroaring)" -v
+  - '%PYTHON%\\python.exe -c "import cydoctest, pyroaring; cydoctest.testmod(pyroaring)" -v'
   - git clean -xfd
   # Test installation from binary wheel
-  - python setup.py bdist_wheel
+  - "build.cmd %PYTHON%\\python.exe setup.py bdist_wheel"
   - for %%f in (dist\pyroaring*.whl) do (pip install %%~f)
-  - python test.py
-  - pip uninstall -y pyroaring
+  - "%PYTHON%\\python.exe test.py"
+  - "%PYTHON%\\python.exe -m pip uninstall -y pyroaring"
   - git clean -xfd
   # Test installation from source distribution
-  - python setup.py sdist
+  - "build.cmd %PYTHON%\\python.exe setup.py sdist"
   - for %%f in (dist\pyroaring*.tar.gz) do (pip install %%~f)
-  - python test.py
-  - pip uninstall -y pyroaring
+  - "%PYTHON%\\python.exe test.py"
+  - "%PYTHON%\\python.exe -m pip uninstall -y pyroaring"
   - git clean -xfd
 
 after_test:
-  - python setup.py bdist_wheel
-  - python setup.py sdist
+  - "build.cmd %PYTHON%\\python.exe setup.py bdist_wheel"
+  - "build.cmd %PYTHON%\\python.exe setup.py sdist"
   - dir dist
 
 artifacts:
