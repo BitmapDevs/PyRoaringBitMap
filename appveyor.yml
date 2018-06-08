@@ -33,7 +33,7 @@ install:
         Invoke-WebRequest https://download.microsoft.com/download/7/9/6/796EF2E4-801B-4FC4-AB28-B59FBF6D907B/VCForPython27.msi -OutFile vc27.msi
         msiexec /q /i vc27.msi
       }
-  - %setup_env%
+  - "%setup_env%"
   - "%PYTHON%\\python.exe -m pip install --upgrade setuptools"
   - "%PYTHON%\\python.exe -m pip install hypothesis Cython wheel"
   - git config core.symlinks true
