@@ -23,13 +23,7 @@ install:
         Invoke-WebRequest https://download.microsoft.com/download/7/9/6/796EF2E4-801B-4FC4-AB28-B59FBF6D907B/VCForPython27.msi -OutFile vc27.msi
         msiexec /q /i vc27.msi
       }
-  - cmd: |
-      IF "%PYTHON:~12,3%"=="x64" (
-        call "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64
-        call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86_amd64
-      ) ELSE (
-        call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86
-      )
+  - "env.cmd"
   - "%PYTHON%\\python.exe -m pip install --upgrade setuptools"
   - "%PYTHON%\\python.exe -m pip install hypothesis Cython wheel"
   - git config core.symlinks true
