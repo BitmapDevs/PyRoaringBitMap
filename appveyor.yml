@@ -24,10 +24,10 @@ install:
         msiexec /q /i vc27.msi
       }
   - cmd: |
-      IF "%PYTHON:~12,2%"=="-x64" (
+      IF "%PYTHON:~12,3%"=="x64" (
         call "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64
         call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86_amd64
-      ) else (
+      ) ELSE (
         call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86
       )
   - "%PYTHON%\\python.exe -m pip install --upgrade setuptools"
