@@ -5,27 +5,17 @@ skip_branch_with_pr: false
 environment:
   matrix:
     - PYTHON: "C:\\Python27"
-      setup_env: 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86'
     - PYTHON: "C:\\Python33"
-      setup_env: 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86'
     - PYTHON: "C:\\Python34"
-      setup_env: 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86'
     - PYTHON: "C:\\Python35"
-      setup_env: 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86'
     - PYTHON: "C:\\Python36"
-      setup_env: 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86'
     - PYTHON: "C:\\Python27-x64"
-      setup_env: 'call "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64 && call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86_amd64'
     - PYTHON: "C:\\Python33-x64"
-      setup_env: 'call "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64 && call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86_amd64'
       DISTUTILS_USE_SDK: "1"
     - PYTHON: "C:\\Python34-x64"
-      setup_env: 'call "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64 && call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86_amd64'
       DISTUTILS_USE_SDK: "1"
     - PYTHON: "C:\\Python35-x64"
-      setup_env: 'call "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64 && call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86_amd64'
     - PYTHON: "C:\\Python36-x64"
-      setup_env: 'call "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64 && call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86_amd64'
 
 install:
   - ps: |
@@ -33,7 +23,13 @@ install:
         Invoke-WebRequest https://download.microsoft.com/download/7/9/6/796EF2E4-801B-4FC4-AB28-B59FBF6D907B/VCForPython27.msi -OutFile vc27.msi
         msiexec /q /i vc27.msi
       }
-  - "%setup_env%"
+  - cmd: |
+      IF "%PYTHON:~12,2%"=="-x64" (
+        call "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64
+        call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86_amd64
+      ) else (
+        call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86
+      )
   - "%PYTHON%\\python.exe -m pip install --upgrade setuptools"
   - "%PYTHON%\\python.exe -m pip install hypothesis Cython wheel"
   - git config core.symlinks true
