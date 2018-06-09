@@ -12,7 +12,6 @@ environment:
     - py_version: 36
 
 platform:
-  - x86
   - x64
 
 install:
@@ -20,45 +19,16 @@ install:
   - IF "%PLATFORM%" == "x64" ( set "PYTHON=%PYTHON%-x64" )
   - IF "%PLATFORM%" == "x64" ( set "vcvarsall_arg=amd64" ) ELSE ( set "vcvarsall_arg=x86" )
   - IF "%py_version%" == "34" ( set "DISTUTILS_USE_SDK=1" )
-  - IF "%py_version%" == "27" (
-    ) ELSE (
-      CALL "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" %vcvarsall_arg%
-    )
   - set "PATH=%PYTHON%\\scripts;%PYTHON%;%PATH%"
-  - %PYTHON%\\python.exe -m pip install --upgrade setuptools
-  - %PYTHON%\\python.exe -m pip install hypothesis Cython wheel
+  - "%PYTHON%\\python.exe -m pip install --upgrade setuptools"
+  - "%PYTHON%\\python.exe -m pip install hypothesis Cython wheel"
   - git config core.symlinks true
   - git reset --hard
   - git submodule init
   - git submodule update
+  - "%PYTHON%\\python.exe  setup.py build_ext -i"
 
 build: off
-
-test_script:
-  # Run tests (note ci profile takes a while)
-  - %PYTHON%\\python.exe  setup.py build_ext -i
-  - set HYPOTHESIS_PROFILE=ci
-  - %PYTHON%\\python.exe test.py
-  - set HYPOTHESIS_PROFILE=dev
-  - %PYTHON%\\python.exe -c "import cydoctest, pyroaring; cydoctest.testmod(pyroaring)" -v
-  - git clean -xfd
-  # Test installation from binary wheel
-  - %PYTHON%\\python.exe setup.py bdist_wheel
-  - for %%f in (dist\pyroaring*.whl) do (%PYTHON%\\python.exe -m pip install %%~f)
-  - %PYTHON%\\python.exe test.py
-  - %PYTHON%\\python.exe -m pip uninstall -y pyroaring
-  - git clean -xfd
-  # Test installation from source distribution
-  - %PYTHON%\\python.exe setup.py sdist
-  - for %%f in (dist\pyroaring*.tar.gz) do (%PYTHON%\\python.exe -m pip install %%~f)
-  - %PYTHON%\\python.exe test.py
-  - %PYTHON%\\python.exe -m pip uninstall -y pyroaring
-  - git clean -xfd
-
-after_test:
-  - %PYTHON%\\python.exe setup.py bdist_wheel
-  - %PYTHON%\\python.exe setup.py sdist
-  - dir dist
 
 artifacts:
   - path: dist\*
