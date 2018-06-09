@@ -23,9 +23,9 @@ install:
   - ps: |
       if ($env:py_version -eq "27") {
         Invoke-WebRequest https://download.microsoft.com/download/7/9/6/796EF2E4-801B-4FC4-AB28-B59FBF6D907B/VCForPython27.msi -OutFile vc27.msi
-        msiexec /q /log mylog.txt /i vc27.msi
+        msiexec /q  /i vc27.msi
+        gci -r C:\ vcvarsall.bat
       }
-  - ps: dir "$Env:USERPROFILE\AppData\Local\Programs\Common\Microsoft\Visual C++ for Python\9.0\"
   - IF "%py_version%" == "27" (
       CALL "C:\Program Files (x86)\Common Files\Microsoft\Visual C++ for Python\9.0\vcvarsall.bat" %vcvarsall_arg%
     ) ELSE (
