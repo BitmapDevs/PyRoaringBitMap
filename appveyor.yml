@@ -20,20 +20,13 @@ install:
   - IF "%PLATFORM%" == "x64" ( set "PYTHON=%PYTHON%-x64" )
   - IF "%PLATFORM%" == "x64" ( set "vcvarsall_arg=amd64" ) ELSE ( set "vcvarsall_arg=x86" )
   - IF "%py_version%" == "34" ( set "DISTUTILS_USE_SDK=1" )
-  - ps: |
-      if ($env:py_version -eq "27") {
-        Invoke-WebRequest https://download.microsoft.com/download/7/9/6/796EF2E4-801B-4FC4-AB28-B59FBF6D907B/VCForPython27.msi -OutFile vc27.msi
-        msiexec /q  /i vc27.msi
-        gci -r C:\ vcvarsall.bat
-      }
   - IF "%py_version%" == "27" (
-      CALL "C:\Program Files (x86)\Common Files\Microsoft\Visual C++ for Python\9.0\vcvarsall.bat" %vcvarsall_arg%
     ) ELSE (
       CALL "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" %vcvarsall_arg%
     )
   - set "PATH=%PYTHON%\\scripts;%PYTHON%;%PATH%"
-  - pip install --upgrade setuptools
-  - pip install hypothesis Cython wheel
+  - %PYTHON%\\python.exe -m pip install --upgrade setuptools
+  - %PYTHON%\\python.exe -m pip install hypothesis Cython wheel
   - git config core.symlinks true
   - git reset --hard
   - git submodule init
@@ -43,28 +36,28 @@ build: off
 
 test_script:
   # Run tests (note ci profile takes a while)
-  - python setup.py build_ext -i
+  - %PYTHON%\\python.exe  setup.py build_ext -i
   - set HYPOTHESIS_PROFILE=ci
-  - python test.py
+  - %PYTHON%\\python.exe test.py
   - set HYPOTHESIS_PROFILE=dev
-  - python -c "import cydoctest, pyroaring; cydoctest.testmod(pyroaring)" -v
+  - %PYTHON%\\python.exe -c "import cydoctest, pyroaring; cydoctest.testmod(pyroaring)" -v
   - git clean -xfd
   # Test installation from binary wheel
-  - python setup.py bdist_wheel
-  - for %%f in (dist\pyroaring*.whl) do (pip install %%~f)
-  - python test.py
-  - pip uninstall -y pyroaring
+  - %PYTHON%\\python.exe setup.py bdist_wheel
+  - for %%f in (dist\pyroaring*.whl) do (%PYTHON%\\python.exe -m pip install %%~f)
+  - %PYTHON%\\python.exe test.py
+  - %PYTHON%\\python.exe -m pip uninstall -y pyroaring
   - git clean -xfd
   # Test installation from source distribution
-  - python setup.py sdist
-  - for %%f in (dist\pyroaring*.tar.gz) do (pip install %%~f)
-  - python test.py
-  - pip uninstall -y pyroaring
+  - %PYTHON%\\python.exe setup.py sdist
+  - for %%f in (dist\pyroaring*.tar.gz) do (%PYTHON%\\python.exe -m pip install %%~f)
+  - %PYTHON%\\python.exe test.py
+  - %PYTHON%\\python.exe -m pip uninstall -y pyroaring
   - git clean -xfd
 
 after_test:
-  - python setup.py bdist_wheel
-  - python setup.py sdist
+  - %PYTHON%\\python.exe setup.py bdist_wheel
+  - %PYTHON%\\python.exe setup.py sdist
   - dir dist
 
 artifacts:
