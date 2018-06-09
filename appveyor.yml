@@ -25,12 +25,11 @@ install:
         Invoke-WebRequest https://download.microsoft.com/download/7/9/6/796EF2E4-801B-4FC4-AB28-B59FBF6D907B/VCForPython27.msi -OutFile vc27.msi
         msiexec /q /i vc27.msi
       }
-  - cmd: |
-      IF "%py_version%" == "27" (
-        CALL "C:\Program Files (x86)\Common Files\Microsoft\Visual C++ for Python\9.0\vcvarsall.bat" %vcvarsall_arg%
-      ) ELSE (
-        CALL "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" %vcvarsall_arg%
-      )
+  - IF "%py_version%" == "27" (
+      CALL "C:\Program Files (x86)\Common Files\Microsoft\Visual C++ for Python\9.0\vcvarsall.bat" %vcvarsall_arg%
+    ) ELSE (
+      CALL "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" %vcvarsall_arg%
+    )
   - set "PATH=%PYTHON%\\scripts;%PYTHON%;%PATH%"
   - pip install --upgrade setuptools
   - pip install hypothesis Cython wheel
