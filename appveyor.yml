@@ -17,17 +17,20 @@ platform:
 
 install:
   - set "PYTHON=C:\\Python%py_version%"
-  - ps: if ($Env:PLATFORM -eq "x64") { $Env:PYTHON = "${Env:PYTHON}-x64" }
-  - ps: if ($Env:PLATFORM -eq "x64") { $Env:VCVARSALL_ARG = "amd64" } else { $Env:VCVARSALL_ARG = "x86" }
-  - ps: if ($Env:py_version -eq "34") { $Env:DISTUTILS_USE_SDK = "1" }
+  - IF "%PLATFORM%" == "x64" ( set "PYTHON=%PYTHON%-x64" )
+  - IF "%PLATFORM%" == "x64" ( set "vcvarsall_arg=amd64" ) ELSE ( set "vcvarsall_arg=x86" )
+  - IF "%py_version%" == "34" ( set "DISTUTILS_USE_SDK=1" )
   - ps: |
       if ($env:py_version -eq "27") {
         Invoke-WebRequest https://download.microsoft.com/download/7/9/6/796EF2E4-801B-4FC4-AB28-B59FBF6D907B/VCForPython27.msi -OutFile vc27.msi
         msiexec /q /i vc27.msi
-        "C:\Program Files (x86)\Common Files\Microsoft\Visual C++ for Python\9.0\vcvarsall.bat" $Env:VCVARSALL_ARG
-      } else {
-        "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" $Env:VCVARSALL_ARG
       }
+  - cmd: |
+      IF "%py_version%" == "27" (
+        CALL "C:\Program Files (x86)\Common Files\Microsoft\Visual C++ for Python\9.0\vcvarsall.bat" %vcvarsall_arg%
+      ) ELSE (
+        CALL "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" %vcvarsall_arg%
+      )
   - set "PATH=%PYTHON%\\scripts;%PYTHON%;%PATH%"
   - pip install --upgrade setuptools
   - pip install hypothesis Cython wheel
